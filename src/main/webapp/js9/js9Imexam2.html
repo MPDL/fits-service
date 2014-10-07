@@ -1,0 +1,79 @@
+<html>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+      <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+      <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
+      <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
+      <link type="text/css" rel="stylesheet" href="js9.css">
+      <script type="text/javascript" src="js/jquery.min.js"></script>
+      <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
+      <script type="text/javascript" src="js/sprintf.min.js"></script>
+      <script type="text/javascript" src="js/dhtmlwindow.min.js">	
+      /***********************************************
+      * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
+      * This notice must stay intact for legal use.
+      * Visit http://www.dynamicdrive.com/ for full source code
+      ***********************************************/
+      </script>
+
+      <script language="javascript" type="text/javascript" src="http://www.cfa.harvard.edu/~john/flot/jquery.flot.selection.min.js"></script>
+      <script type="text/javascript" src="plugins/imexam/flot-zoom.js"></script>
+
+  <script type="text/javascript" src="js/fabric.js"></script>
+  <script type="text/javascript" src="js/fitsy.js"></script>
+      <script type="text/javascript" src="js/astrolib.js"></script>
+      <script type="text/javascript" src="js9.js"></script>
+
+      <script type="text/javascript" src="plugins/fitsy/pako_inflate.min.js"></script>
+      <script type="text/javascript" src="plugins/fitsy/bzip2.js"></script>
+      <script type="text/javascript" src="plugins/fitsy/lzma_worker.js"></script>
+
+      <script type="text/javascript" src="plugins/imexam/imexam.js"></script>
+      <script type="text/javascript" src="plugins/imexam/regstat.js"></script>
+      <script type="text/javascript" src="plugins/imexam/xyproj.js"></script>
+      <script type="text/javascript" src="plugins/imexam/reghist.js"></script>
+      <script type="text/javascript" src="plugins/imexam/radproj.js"></script>
+      <script type="text/javascript" src="plugins/imexam/3dplot.js"></script>
+      <script type="text/javascript" src="plugins/imexam/encircled.js"></script>
+
+      <script type="text/javascript" src="plugins/imexam/pixtable.js"></script>
+      <script type="text/javascript" src="plugins/imexam/contour.js"></script>
+
+    </head>
+    <body>
+    <ul>
+    <div style="float: right;"><a href="plugins/imexam/imexam.html">Help</a></div>
+
+    <font size="+1"><center>
+    <b>JS9 Imexam: browser-based imexam using JS9 plugins</b>
+    </center></font>
+    <p>
+    <li><A href="javascript:Fitsy.fetchURL('1212.fits', 'fits/1212.fits', undefined, window.JS9.Load)">DSS 12:0:0 12:0:0</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('STAR1_3.fits', 'fits/STAR1_3.fits', undefined, window.JS9.Load)">FLWO 48 Inch Shack Hartman WFS Image</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('gauss.fits', 'fits/gauss.fits', undefined, window.JS9.Load)">A Gaussian</A></li>
+    <li><A href="javascript:Fitsy.fetchURL('dot.fits', 'fits/dot.fits', undefined, window.JS9.Load)">A Dot</A></li>
+    </ul>
+
+    <table>
+    <tr valign="top">
+    <td>
+    <div class="JS9Menubar" id="JS9Menubar"></div>
+    <div class="JS9" id="JS9"></div>
+    </td>
+    <td>
+    <table class="ImExam">
+    <tr><td><div class="ImExamRegionStats" data-js9id="JS9"></div></td>
+        <td><div class="ImExam3dPlot"      data-js9id="JS9"></div></td></tr>
+    <tr><td><div class="ImExamXProj"       data-js9id="JS9"></div></td>
+        <td><div class="ImExamYProj"       data-js9id="JS9"></div></td></tr>
+    </table>
+    </td>
+    </tr>
+    </table>
+
+
+    </body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head> 
+  <meta name="language" content="en" \>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+  <link type="image/x-icon" rel="shortcut icon" href="%FITS_SERVICE_PLACEHOLDER%/js9/favicon.ico">
+  <link type="text/css" rel="stylesheet" href="%FITS_SERVICE_PLACEHOLDER%/js9/js9support.css">
+  <link type="text/css" rel="stylesheet" href="%FITS_SERVICE_PLACEHOLDER%/js9/css/tabcontent.css">
+  <link type="text/css" rel="stylesheet" href="%FITS_SERVICE_PLACEHOLDER%/js9/js9.css">
+  <script type="text/javascript" src="%FITS_SERVICE_PLACEHOLDER%/js9/js9support.min.js"></script>
+  <script type="text/javascript" src="%FITS_SERVICE_PLACEHOLDER%/js9/fitsy.min.js"></script>
+  <script type="text/javascript" src="%FITS_SERVICE_PLACEHOLDER%/js9/js9.min.js"></script>
+  <script type="text/javascript" src="%FITS_SERVICE_PLACEHOLDER%/js9/js9plugins.js"></script>
+  <title>SAOimage JS9</title>
+</head>
+<body onload="initMyAnalysis();">
+    <script type="text/javascript">
+    var aname, im, lastim, lastreg;
+    var ncall = 0;
+    // this is the callback for all region changes
+    JS9.Regions.opts.onchange = runMyAnalysis;
+    // called when the function changes to redo the last display
+    function redo(){
+      if( lastim && lastreg ){
+        runMyAnalysis(lastim, lastreg);
+      }
+    }
+    // add event handlers to the analysis buttons to execute the specified task
+    // note that jQuery is available automatically
+    function initMyAnalysis(){
+       JS9.Preload("%FILE_URL_PLACEHOLDER%");
+    }
+    // run analysis on current image, defining a function to display results
+    function runMyAnalysis(im, xreg){
+        var rarr = [];
+        lastim = im;
+        lastreg = xreg;
+        // process analysis request
+        if( aname ){
+          switch(aname){
+          case "counts":
+            JS9.RunAnalysis(null, "counts", null, dispMyAnalysis);
+            break;
+          case "radial":
+            JS9.RunAnalysis(null, "radialprofile", null, dispMyAnalysis);
+            break;
+          case "spectrum":
+            JS9.RunAnalysis(null, "energyplot", null, dispMyAnalysis);
+            break;
+          default:
+            JS9.error("unknown analysis task: "+aname);
+            break;
+          }
+        }
+    }
+    // display function passed to JS9.RunAnalysis and JS9.SubmitAnalysis
+    // when the analysis task is complete, this callback displays results
+    function dispMyAnalysis(stdout, stderr, a){
+      var rdiv = $("#myAnalysisResults")[0];
+      if( !rdiv ){
+        alert("the analysis results area is missing on this web page");
+      }
+      else if( stderr ){
+        alert(stderr);
+      } else {
+        switch(a.rtype){
+        case "text":
+          // text can just get shoved into the div
+          rdiv.innerHTML = "<pre>" + stdout + "</pre>";
+          break;
+        case "plot":
+          // plot can make use of the already-loaded flot routines
+          // ( and JS9.plotOpts is defined in js9-version.js)
+          try{ 
+	    // retrieve plot object (should contain a data object)
+	    pobj = JSON.parse(stdout);
+            if( pobj && pobj.data ){
+              // erase explanatory text
+              rdiv.innerHTML = "";
+    	      // plot the data
+	      $.plot(rdiv, [pobj], JS9.plotOpts);
+	    } else {
+              alert("no analysis data returned");
+            }
+          }
+	  catch(e){ alert("can't plot data: "+e+" "+stdout)};
+          break;
+        }
+      }
+    }
+    </script>
+      <h2><center>JS9: image display right in your browser</center></h2>
+    <table cellspacing="30">
+    <tr valign="top">
+    <td>
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+    </td>
+    <td>
+
+  </body>
+</html>

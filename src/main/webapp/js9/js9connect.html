@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+  <link type="image/x-icon" rel="shortcut icon" href="./favicon.ico">
+  <link type="text/css" rel="stylesheet" href="js9support.css">
+  <link type="text/css" rel="stylesheet" href="js9.css">
+  <script type="text/javascript" src="js9support.min.js"></script>
+  <script type="text/javascript" src="fitsy.min.js"></script>
+  <script type="text/javascript" src="js9.min.js"></script>
+  <script type="text/javascript" src="js9plugins.js"></script>
+</head>
+<body>
+    <font size="+1"><center>
+    <b>JS9 Demo: connecting two images</b>
+    <p>
+    <div class="ConnectImages" data-js9id="JS9"></div>
+    </center></font>
+    <table  cellspacing="10px">
+    <tr valign="top">
+    <td>
+    Source image:
+    <a href='javascript:JS9.Load("png/i1000.png", {scale:"linear", colormap:"grey"});'>i1000 (v=x*1000+y)</a>
+    </td>
+    <td>
+    Magnified image:
+    <a href='javascript:JS9.Load("png/f1000.png", {scale: "linear", colormap: "grey", display: "myJS9"});'>float 1000x1000 (v=x.y/1000)</a>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <div class="JS9Menubar"></div>
+    <div class="JS9" id="JS9"></div>
+    </td>
+    <td>
+    <div class="JS9Menubar" id="myJS9Menubar"></div>
+    <div class="JS9" id="myJS9"></div>
+    </td>
+    </tr>
+    </table>
+<p>
+JS9 Demos:
+<ul>
+<li><a href='js9basics.html'>JS9 Demo: the basics</a>
+<li><a href='js9plugins.html'>JS9 Demo: adding plugins to JS9</a> 
+<li><a href='js9imexam.html'>JS9 Demo: the imexam plugin for JS9</a> 
+<li><a href='js9cat.html'>JS9 Demo: overlaying catalogs</a>
+<li><a href='js9panzoom.html'>JS9 Demo: pan and zoom</a> 
+<li><a href='js9rgb.html'>JS9 Demo: RGB composite images</a> 
+<li><a href='js9multi.html'>JS9 Demo: independent instances of JS9</a> 
+<li><a href='js9analysis.html'>JS9 Demo: remote data analysis</a> 
+<li><a href='js9onchange.html'>JS9 Demo: running tasks when a region changes</a>
+<li><a href='js9create.html'>JS9 Demo: creating a JS9 instance dynamically</a> 
+<li><a href='js9preload.html'>JS9 Demo: preloading images into JS9</a>
+<li><a href='js9bitpix.html'>JS9 Demo: displaying different FITS datatypes</a> 
+</ul>
+<script>
+var im1, im2, offscreen;
+
+// constructor adds HTML to the plugin div
+function constructor(){
+    var i, s, z, buttons;
+    buttons = "";
+    // zoom options
+    for(i=0; i<=6; i++){
+      z = Math.pow(2,i);
+      if( z === 4 ){
+        s = "checked";
+      } else {
+        s = "";
+      }
+      buttons += sprintf('<input type="radio" name="zoom" value="%d" %s>Zoom%d</input>', z, s, z);
+    }
+    this.divjq.html(buttons);
+}
+
+// callback when mouse moves
+function mousemove(im, ipos1, evt){
+  var zoom;
+  // get handle for source image
+  if( !im1 ){
+    im1 = JS9.GetImage("JS9");  
+  }
+  // get handle for magnified image
+  if( !im2 ){
+    im2 = JS9.GetImage("myJS9");  
+  }
+  // once we have the magnified image, make an offscreen image
+  // use it to show the magnified image centered at the image pos of the source
+  if( im2 && !offscreen ){
+      offscreen = document.createElement('canvas');
+      offscreen.width  = im2.display.canvas.width;
+      offscreen.height = im2.display.canvas.height;
+      offscreen.getContext('2d').drawImage(im2.display.canvas, 0, 0);
+  }
+  // magnify the magnify image based on the source image position
+  if( im2 ){
+    zoom = $('input[name="zoom"]:checked').val() || 2; 
+    displayMagnifier(im2, ipos1, zoom);
+  }
+}
+
+// taken from js9 magnifier
+displayMagnifier = function(im, ipos1, zoom){
+    var pos, ipos, tval, display, ctx;
+    var simage, cw, ch, sx, sy, sw, sh, dx, dy, dw, dh;
+    var YFUDGE = 1;
+    // canvas dimensions and context
+    // note to Eric: canvas needs to be exposed in public API??
+    cw = im.display.canvas.width;
+    ch = im.display.canvas.height;
+    ctx = im.display.canvas.getContext('2d');
+    // ipos is 1-based when it comes in. convert to 0-based
+    ipos = {x: ipos1.x - 1, y: ipos1.y - 1};
+    // image pos -> display pos
+    // note to Eric: routine needs to be exposed in public API??
+    pos = im.getDisplayPos(ipos);
+    // width and length of source
+    sw = Math.floor(cw / zoom);
+    sh = Math.floor(ch / zoom);
+    // x and y of source
+    sx = pos.x - (sw/2);
+    // why is fudge needed??
+    sy = pos.y - (sh/2) - YFUDGE;
+    // default destination parameters
+    dx = 0;
+    dy = 0;
+    dw = cw;
+    dh = ch;
+    // adjust for boundaries
+    if( sx < 0 ){
+	sw += sx;
+	dx -= (sx * zoom);
+	dw += (sx * zoom);
+	sx = 0;
+    }
+    tval = (sx + sw) - cw;
+    if( tval > 0  ){
+	sw -= tval;
+	dw = sw * zoom;
+    }
+    if( sy < 0 ){
+	sh += sy;
+	dy -= (sy * zoom);
+	dh += (sy * zoom);
+	sy = 0;
+    }
+    tval = sy + sh - ch;
+    if( tval > 0 ){
+	sh -= tval;
+	dh = sh * zoom;
+    }
+    // clear display
+    ctx.clearRect(0, 0, cw, ch);
+    // draw offscreen image at correct center and zoom
+    ctx.drawImage(offscreen, sx, sy, sw, sh, dx, dy, dw, dh);
+    // draw a rectangle at the source mouse location with size zoom,zoom
+    ctx.beginPath();
+    ctx.rect(cw/2, ch/2, zoom, zoom);
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#00FF00';
+    ctx.stroke();
+    // display current value in magnified image
+    // note to Eric: routine needs to be exposed in public API??
+    im.displayValues(ipos);
+}
+
+// register the plugin
+JS9.RegisterPlugin("Connect", "Images", constructor,
+		   {mousemove: mousemove, winDims: [0, 0]});
+
+</script>
+</body>
+</html>

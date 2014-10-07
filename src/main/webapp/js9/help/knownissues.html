@@ -1,0 +1,194 @@
+<html>
+<head>
+<style>
+.container{
+  padding: 10px;
+}
+</style>
+<title>JS9 Known Issues</title>
+</head>
+<body>
+<div class="container">
+<h3><center>JS9 Known Issues</center></h3>
+
+<ol>
+<li> <b>All platforms, especially Chrome (June 21, 2014 : NOT resolved)</b>
+<p>
+Available memory can be a problem when loading very large gzip'ed FITS
+files, especially in 32-bit Chrome. JS9 currently reads the entire
+FITS file or gzip'ed file and inflates parts as needed. It can process
+files up to approx. 200Mb in size before Chrome runs out of heap
+space.  Note that Chrome often will load an ungzip'ed FITS file in
+cases where the gzip'ed file fails (though there still are upper
+limits on the total space available).  We hope that the 64-bit version
+of Chrome (in early Canary release as of 7/1/2014) will alleviate
+these problems. Otherwise, we will take a more drastic approach to
+memory management within JS9 (at the expanse of speed).
+
+<li> <b>All platforms (June 21, 2014 : NOT resolved)</b>
+<p>
+The zscale algorithm requires allocation of a fixed-size static memory
+buffer. We have limited the size of this secondary buffer to be large
+enough to handle a 2048 x 2048 x 4-byte image. If your image is larger
+than this, zscale will not run. We will revisit the size of the
+static buffer as we gain more experience with the size of images being
+analyzed. To date, 2048 x 2048 seems to be a reasonable compromise.
+
+<li> <b>All platforms (June 13, 2014 : NOT resolved)</b>
+<p>
+When resizing a box region in one direction only (i.e., width or
+height), the width of the region's border will be different in each
+direction.  This is due to the underlying graphics algorithm used to
+resize the region, which changes the scale factor in each direction
+individually and ties the border width to that scale factor. We will
+fix this in a future release.
+
+<li> <b>All platforms using Chrome (March 27, 2014 : resolved)</b>
+<p>
+One of the simplest ways to use JS9 locally is by means of the file://
+URL scheme, e.g., point your browser to file:///home/me/js9/js9basics.html.
+<p>
+This does not work in Google Chrome because Chrome does not permit a
+local HTML file to read other local files. You can read a relatively
+emotional argument about this restriction at:
+<pre>
+    https://code.google.com/p/chromium/issues/detail?id=37586
+</pre>
+<p>
+The workaround is to start Chrome with the 
+--allow-file-access-from-files switch. On Linux:
+<pre>
+    chrome --allow-file-access-from-files
+</pre>
+On a Mac:
+<pre>
+    open /Applications/Google\ Chrome.app --args --allow-file-access-from-files
+</pre>
+
+<li> <b>All platforms using Chrome (November 20, 2013: resolved)</b>
+<p>
+Google Chrome version 31.0.1650.57 (released for Mac on 11/14/2013)
+broke the HTML5 setTransform call and with it, catalog and region
+display in JS9 beta9 and earlier. This bug has been fixed in the
+Chrome canary build as of December 9, 2013, but it's unclear how long
+it will take to release a stable version. A work-around has been added
+to JS9 beta10 for Chrome v31 and v32. Update: Chrome v33 is fixed.
+
+<li> <b>All platforms (May 20, 2013: resolved)</b>
+<p>
+If the "load image" command is part of a group of commands passed to
+the js9 script, a race condition can occur when subsequent commands
+are executed before the image is fully loaded. To avoid this problem,
+images should be loaded in a separate js9 command and the load status
+checked for completion before proceeding to manipulate the image.  See
+the <b>js9load</b> script for details (or just use the script itself
+to load images). (Technical details: images are loaded asynchronously,
+so that other parts of the Web page are available during the load
+process. A synchronous load could freeze the Web page while
+loading. To avoid this situation, external processes should use the
+"status load" command to check for a completed load before sending
+further processing commands).
+
+<li> <b>Mac OS X (May 10, 2013: apparently resolved)</b>
+<p>
+On a Mac running Firefox 20 (but not Safari or Chrome), deleting a region
+using the individual region's context menu sometimes does not erase it. 
+Moreover, this problem only seems to happen when the context menu
+is brought up using a long-press (double-click seems to work).
+<p>
+The underlying issue is that a call to the HTML5 ctx.clearRect()
+routine does not actually erase the canvas. It only occurs when
+hardware acceleration is turned on with the following FireFox preference:
+<pre>
+  Preferences -> Advanced -> General -> Use hardware acceleration when available
+</pre>
+We believe this is a bug in how Firefox is handling the canvas using
+the Mac graphics accelerator. Hopefully, it will be fixed in a future
+release. Work-arounds include: use double-click to bring up the context menu,
+use Safari or Chrome.
+<p>
+The region generally will disappear as soon as some other JS9 action
+is performed that changes the display (e.g. change contrast/bias,
+select a menu, display new image, etc). We therefore recommend living
+with the problem for a while in the hope that Mozilla fixes it soon.
+<p>
+Update as of 11/21/2013: This problem apparently has been fixed by
+Firefox.
+
+<li> <b>Linux (January 15, 2013: resolved)</b>
+<p>
+When running Firefox on some Linux machines (especially Debian or
+Ubuntu), clicking and moving the mouse does not refresh the image with
+new contrast/bias parameters until the mouse actually stops.  Instead
+of continually redisplaying the image, the image is redrawn once at the end.
+<p>
+This problem does not affect Chrome on Linux boxes, so one work-around is to
+switch browsers ...
+<p>
+However, a configuration fix for this problem is proposed here:
+<p>
+http://www.hackermusings.com/2012/05/firefoxs-graphics-performance-on-x11/
+<pre>
+	It’s been long known that a vocal minority (or perhaps even
+	majority) of Firefox users have had issues with rendering
+	performance on X11, but nobody has quite pinpointed what the
+	issue is.
+
+	Recently Nicolas Silva landed a change in mozilla-central to
+	add a preference to allow for disabling the use of the RENDER
+	extension when drawing using Cairo on X11. I’d like to call on
+	any Firefox/Linux users who have been experiencing speed
+	issues to download the latest nightly and go to about:config
+	and set “gfx.xrender.enabled” to “false”. If you could also
+	let me know what hardware and drivers you’re running that’d
+	also be great.
+</pre>
+<p>
+During our debugging efforts, this fix worked on almost all
+Debian/Ubuntu/CentOS machines exhibiting the problem. Here are
+detailed instructions to implement the work-around:
+<ol>
+<li> Start Firefox
+<li> Go go the url: about:config
+<li> Promise you'll be careful
+<li> Type <b>gfx</b> in the Search box to find all graphics parameters
+<li> Set <b>gfx.xrender.enabled</b> to <b>false</b>
+<li> Exit and restart Firefox
+</ol>
+<p>
+Some Linux machines did not respond to this fix. Instead they were
+fixed by setting the <b>about:config</b> parameter named
+<b>gfx.canvas.azure.enabled</b> to <b>false</b>. The instructions
+for doing this are similar to those above:
+<ol>
+<li> Start Firefox
+<li> Go go the url: about:config
+<li> Promise you'll be careful
+<li> Type <b>gfx</b> in the Search box to find all graphics parameters
+<li> Set <b>gfx.canvas.azure.enabled</b> to <b>false</b>
+<li> Exit and restart Firefox
+</ol>
+<p>
+It is clear that Firefox's support for the HTML5 canvas element is
+evolving as they develop more sophisticated optimization techniques.
+Please let us know if you have problems with contrast/bias redisplay.
+
+<p>
+<li> <b>Mac OS X (January 15, 2013: resolved)</b>
+<p>
+When running Firefox version 17 and below, mouse movement does not update
+the position/value display until the mouse stops. Similarly, contrast/bias
+mouse movement does not refresh the image until the mouse stops. This happens
+<b>only</b> when the following Preference is <b>unset</b>:
+<pre>
+    Advanced -> General -> Use hardware acceleration when available
+</pre>
+<p>
+To fix this problem, either set the Preference or upgrade to Firefox 18.
+</ol>
+
+<h5>Last updated: July 22, 2014</h5>
+</div>
+
+</body>
+</html>

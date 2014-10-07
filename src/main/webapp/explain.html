@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>fits service explain page</title>
+</head>
+<body>
+<h1>Upload a File</h1>
+
+<form action="/fits/api/view" method="post" enctype="multipart/form-data" onsubmit="return checkFiles(this);">
+
+    <p>
+        Select a file : <input type="file" name="file1" size="50" />
+    </p>
+
+    <input type="submit" value="View" />
+    <input type="submit" value="Generate Thumbnail" onclick="this.form.action='/fits/api/thumb';"/>
+    <input type="reset" value="Reset">
+</form>
+
+
+<h1>or put .fits here:</h1>
+
+<form action="/fits/api/view" method="post" onsubmit="return checkTextarea(this);">
+
+    <p>
+        <textarea name="fits" cols="40" rows="10" maxlength="10240000"></textarea>
+    </p>
+
+    <input type="submit" value="View" />
+    <input type="submit" value="Generate Thumbnail" onclick="this.form.action='/fits/api/thumb';"/>
+    <input type="reset" value="Reset">
+</form>
+
+<h1>or put url to .fits here:</h1>
+
+<form action="/fits/api/view" method="get" onsubmit="return checkUrl(this);">
+
+    <p>
+        <input name="url" id="url" type="text" size="40" />
+    </p>
+
+    <input type="submit" value="View" />
+    <input type="submit" value="Generate Thumbnail" onclick="this.form.action='/fits/api/thumb';"/>
+    <input type="reset" value="Reset">
+</form>
+
+<p>
+    See <a href="https://github.com/MPDL/fits-service/blob/master/README.md#usage"> the documentation </a> for usage details.
+</p>
+
+<script type="text/javascript">
+    function setPortable(form) {
+        var field = form.elements.portable;
+        if (field) {
+            field.value = "true";
+        }
+    }
+
+    function checkFiles(form) {
+        if (form.elements.file1.value) {
+            return true;
+        } else {
+            alert("Please choose .fits file!");
+            return false;
+        }
+    }
+
+    function checkTextarea(form) {
+        var text = form.elements.fits;
+        if (text.value && text.value != '' ) {
+            return true;
+        } else {
+            alert("Please put .fits text!");
+            return false;
+        }
+    }
+
+    function checkUrl(form) {
+        var url = form.elements.url;
+        if (url.value && url.value.trim() != '' ) {
+            return true;
+        } else {
+            alert("Please input URL to .fits!");
+            return false;
+        }
+    }
+</script>
+
+</body>
+</html>
