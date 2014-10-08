@@ -5,7 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -19,6 +23,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +32,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closer;
 
 import de.mpg.mpdl.service.rest.fits.ServiceConfiguration;
+import de.mpg.mpdl.service.rest.fits.ServiceConfiguration.Pathes;
 
 public class RestProcessUtils {
 
@@ -39,11 +45,14 @@ public class RestProcessUtils {
 
 	public static Response generateViewFromTextarea(String text)
 			throws IOException {
-		return buildHtmlResponse(generateResponseHtml(text));
+		File f = File.createTempFile("fits", ".fits");
+		FileUtils.writeStringToFile(f, text, "UTF-´8");
+		return buildHtmlResponse(generateResponseHtml(f.getAbsolutePath()));
 	}
 
 	public static Response generateViewFromUrl(String url) throws IOException {
-		return buildHtmlResponse(generateResponseHtml(url));
+		File f = downloadFile(url);
+		return buildHtmlResponse(generateResponseHtml(f.getAbsolutePath()));
 	}
 
 	public static Response generateViewFromFiles(HttpServletRequest request)
@@ -76,18 +85,20 @@ public class RestProcessUtils {
 		return null;
 	}
 
-
-	public static String generateResponseHtml(String fileUrl)
+	public static String generateResponseHtml(String filePath)
 			throws IOException {
 		//
 		String chunk = getResourceAsString(FITS_VIEW_HTML_TEMPLATE_FILE_NAME);
 		// replace other placeholders
-		return chunk.replace("%FILE_URL_PLACEHOLDER%", fileUrl).replace(
-				"%FITS_SERVICE_PLACEHOLDER%", config.getServiceUrl());
+		filePath = URLEncoder.encode(filePath, "UTF-8");
+		return chunk.replace(
+				"%FILE_URL_PLACEHOLDER%",
+				config.getServiceUrl() + "/api" + Pathes.PATH_FILE + "?file="
+						+ filePath).replace("%FITS_SERVICE_PLACEHOLDER%",
+				config.getServiceUrl());
 	}
 
 	// Helpers
-	
 	public static List<FileItem> uploadFiles(HttpServletRequest request)
 			throws FileUploadException {
 		List<FileItem> items = null;
@@ -101,6 +112,20 @@ public class RestProcessUtils {
 			items = fileUpload.parseRequest(request);
 		}
 		return items;
+	}
+
+	public static File downloadFile(String url) throws MalformedURLException,
+			IOException {
+		URLConnection conn = URI.create(url).toURL().openConnection();
+		File tmp = File.createTempFile("fits", ".fits");
+		ByteStreams.copy(conn.getInputStream(), new FileOutputStream(tmp));
+		return tmp;
+	}
+
+	public static Response readFile(String path) {
+		File f = new File(path);
+		return Response.status(Status.OK).entity(f)
+				.type(MediaType.APPLICATION_OCTET_STREAM).build();
 	}
 
 	public static Response buildHtmlResponse(String str) {

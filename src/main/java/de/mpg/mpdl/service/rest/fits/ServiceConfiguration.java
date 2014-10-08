@@ -13,6 +13,7 @@ public class ServiceConfiguration {
 		public static final String PATH_EXPLAIN = "/explain";
 		public static final String PATH_VIEW = "/view";
 		public static final String PATH_THUMB = "/thumb";
+		public static final String PATH_FILE = "/file";
 	}
 
 	public static final String SERVICE_NAME = "fits";
