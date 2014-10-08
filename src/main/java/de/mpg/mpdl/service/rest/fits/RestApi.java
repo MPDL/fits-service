@@ -45,15 +45,6 @@ public class RestApi {
 		return RestProcessUtils.generateViewFromFiles(request);
 	}
 
-	@POST
-	@Path(Pathes.PATH_VIEW)
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.TEXT_HTML)
-	public Response getViewFromTextarea(@FormParam("fits") String fits)
-			throws IOException {
-		return RestProcessUtils.generateViewFromTextarea(fits);
-	}
-
 	@GET
 	@Path(Pathes.PATH_VIEW)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -62,15 +53,6 @@ public class RestApi {
 			throws IOException {
 		return RestProcessUtils.generateViewFromUrl(url);
 
-	}
-
-	@POST
-	@Path(Pathes.PATH_THUMB)
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces("image/png")
-	public Response getThumbnailFromTextarea(@FormParam("fits") String fits)
-			throws IOException {
-		return RestProcessUtils.generateThumbnailFromTextarea(fits);
 	}
 
 	@POST

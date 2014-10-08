@@ -43,12 +43,6 @@ public class RestProcessUtils {
 	private static final String FITS_VIEW_HTML_TEMPLATE_FILE_NAME = "viewer.html";
 	private static final ServiceConfiguration config = new ServiceConfiguration();
 
-	public static Response generateViewFromTextarea(String text)
-			throws IOException {
-		File f = File.createTempFile("fits", ".fits");
-		FileUtils.writeStringToFile(f, text, "UTF-´8");
-		return buildHtmlResponse(generateResponseHtml(f.getAbsolutePath()));
-	}
 
 	public static Response generateViewFromUrl(String url) throws IOException {
 		File f = downloadFile(url);
@@ -80,10 +74,7 @@ public class RestProcessUtils {
 		return null;
 	}
 
-	public static Response generateThumbnailFromTextarea(String text)
-			throws IOException {
-		return null;
-	}
+
 
 	public static String generateResponseHtml(String filePath)
 			throws IOException {
