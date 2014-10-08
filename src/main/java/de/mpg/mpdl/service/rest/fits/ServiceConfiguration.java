@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import de.mpg.mpdl.service.rest.fits.process.RestProcessUtils;
 import org.apache.commons.io.FilenameUtils;
+
+import de.mpg.mpdl.service.rest.fits.process.RestProcessUtils;
 
 public class ServiceConfiguration {
 
@@ -49,26 +50,28 @@ public class ServiceConfiguration {
 	 */
 	private void load() {
 
-        String loc = "";
-        try {
-            if (System.getProperty("jboss.server.config.dir") != null) {
-                loc = System.getProperty("jboss.server.config.dir");
-            } else if (System.getProperty("catalina.home") != null) {
-                loc = System.getProperty("catalina.home") + "/conf";
-            } else  {
+		String loc = "";
+		try {
+			if (System.getProperty("jboss.server.config.dir") != null) {
+				loc = System.getProperty("jboss.server.config.dir");
+			} else if (System.getProperty("catalina.home") != null) {
+				loc = System.getProperty("catalina.home") + "/conf";
+			} else {
 
-                //if no app server is defined, take props from WEB-INF
-                //(this is the test case)
-                properties.load(RestProcessUtils.getResourceAsInputStream(PROPERTIES_FILENAME));
-                return;
-            }
-            properties.load(new FileInputStream(new File(
-                    FilenameUtils.concat(loc, PROPERTIES_FILENAME))));
+				// if no app server is defined, take props from WEB-INF
+				// (this is the test case)
+				properties.load(RestProcessUtils
+						.getResourceAsInputStream(PROPERTIES_FILENAME));
+				return;
+			}
+			properties.load(new FileInputStream(new File(FilenameUtils.concat(
+					loc, PROPERTIES_FILENAME))));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+	
+	
 
 }

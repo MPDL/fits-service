@@ -60,7 +60,6 @@ public class RestApi {
 	@Produces(MediaType.TEXT_HTML)
 	public Response getViewFromUrl(@QueryParam("url") String url)
 			throws IOException {
-		System.out.println("url:" + url);
 		return RestProcessUtils.generateViewFromUrl(url);
 
 	}
@@ -98,7 +97,6 @@ public class RestApi {
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response getLocalFile(@QueryParam("file") String file)
 			throws IOException {
-		System.out.println("file" + file);
 		return RestProcessUtils.readFile(file);
 
 	}
