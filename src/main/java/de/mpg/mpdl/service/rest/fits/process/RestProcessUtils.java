@@ -45,7 +45,7 @@ public class RestProcessUtils {
 
 	public static Response generateViewFromUrl(String url, String load)
 			throws IOException {
-		if (Boolean.getBoolean(load) || load == null) {
+		if (Boolean.parseBoolean(load) || load == null) {
 			return buildHtmlResponse(generateResponseHtml(getURLForFile(downloadFile(url))));
 		} else
 
