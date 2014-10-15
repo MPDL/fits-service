@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -23,7 +24,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +43,13 @@ public class RestProcessUtils {
 	private static final String FITS_VIEW_HTML_TEMPLATE_FILE_NAME = "viewer.html";
 	private static final ServiceConfiguration config = new ServiceConfiguration();
 
+	public static Response generateViewFromUrl(String url, String load)
+			throws IOException {
+		if (Boolean.getBoolean(load) || load == null) {
+			return buildHtmlResponse(generateResponseHtml(getURLForFile(downloadFile(url))));
+		} else
 
-	public static Response generateViewFromUrl(String url) throws IOException {
-		File f = downloadFile(url);
-		return buildHtmlResponse(generateResponseHtml(f.getAbsolutePath()));
+			return buildHtmlResponse(generateResponseHtml(url));
 	}
 
 	public static Response generateViewFromFiles(HttpServletRequest request)
@@ -74,19 +77,26 @@ public class RestProcessUtils {
 		return null;
 	}
 
-
-
-	public static String generateResponseHtml(String filePath)
-			throws IOException {
+	public static String generateResponseHtml(String url) throws IOException {
 		//
 		String chunk = getResourceAsString(FITS_VIEW_HTML_TEMPLATE_FILE_NAME);
 		// replace other placeholders
-		filePath = URLEncoder.encode(filePath, "UTF-8");
-		return chunk.replace(
-				"%FILE_URL_PLACEHOLDER%",
-				config.getServiceUrl() + "/api" + Pathes.PATH_FILE + "?file="
-						+ filePath).replace("%FITS_SERVICE_PLACEHOLDER%",
-				config.getServiceUrl());
+		return chunk.replace("%FILE_URL_PLACEHOLDER%", url).replace(
+				"%FITS_SERVICE_PLACEHOLDER%", config.getServiceUrl());
+	}
+
+	/**
+	 * Return a link to read a local file
+	 * 
+	 * @param f
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static String getURLForFile(File f)
+			throws UnsupportedEncodingException {
+		String filePath = URLEncoder.encode(f.getAbsolutePath(), "UTF-8");
+		return config.getServiceUrl() + "/api" + Pathes.PATH_FILE + "?file="
+				+ filePath;
 	}
 
 	// Helpers

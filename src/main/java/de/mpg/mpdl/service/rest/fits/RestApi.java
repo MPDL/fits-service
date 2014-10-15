@@ -49,9 +49,9 @@ public class RestApi {
 	@Path(Pathes.PATH_VIEW)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.TEXT_HTML)
-	public Response getViewFromUrl(@QueryParam("url") String url)
+	public Response getViewFromUrl(@QueryParam("url") String url, @QueryParam("load") String load)
 			throws IOException {
-		return RestProcessUtils.generateViewFromUrl(url);
+		return RestProcessUtils.generateViewFromUrl(url, load);
 
 	}
 
