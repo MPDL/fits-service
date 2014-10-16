@@ -64,7 +64,7 @@ public class RestProcessUtils {
 		File file = File.createTempFile("fits", ".fits");
 		ByteStreams.copy(getFirstFileItem(fileItems).getInputStream(),
 				new FileOutputStream(file));
-		return generateResponseHtml(file.getAbsolutePath());
+		return generateResponseHtml(getURLForFile(file));
 	}
 
 	public static Response generateThumbnailFromFiles(HttpServletRequest request)
