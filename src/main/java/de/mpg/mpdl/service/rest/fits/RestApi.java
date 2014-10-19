@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -49,8 +50,9 @@ public class RestApi {
 	@Path(Pathes.PATH_VIEW)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.TEXT_HTML)
-	public Response getViewFromUrl(@QueryParam("url") String url, @QueryParam("load") String load)
+	public Response getViewFromUrl(@QueryParam("url") String url, @QueryParam("load") String load, @Context HttpServletResponse response)
 			throws IOException {
+		response.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
 		return RestProcessUtils.generateViewFromUrl(url, load);
 
 	}
