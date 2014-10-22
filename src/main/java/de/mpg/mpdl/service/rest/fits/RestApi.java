@@ -28,6 +28,7 @@ import de.mpg.mpdl.service.rest.fits.process.RestProcessUtils;
 public class RestApi {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestApi.class);
+	private static final ServiceConfiguration config = new ServiceConfiguration();
 
 	/**
 	 * The static explain is resolved by UrlRewriteRule
@@ -50,11 +51,11 @@ public class RestApi {
 	@Path(Pathes.PATH_VIEW)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.TEXT_HTML)
-	public Response getViewFromUrl(@QueryParam("url") String url, @QueryParam("load") String load, @Context HttpServletResponse response)
+	public Response getViewFromUrl(@QueryParam("url") String url, @QueryParam("load") String load, 
+								   @Context HttpServletResponse response)
 			throws IOException {
-		response.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+		response.setHeader("Access-Control-Allow-Origin", config.getImejiUrl());
 		return RestProcessUtils.generateViewFromUrl(url, load);
-
 	}
 
 	@POST

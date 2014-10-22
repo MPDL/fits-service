@@ -44,6 +44,13 @@ public class ServiceConfiguration {
 			return (String) properties.get("screenshot.service.url");
 		return "http://localhost:8080/screenshot";
 	}
+	
+	public String getImejiUrl() {
+		if (properties.containsKey("imeji.service.url"))
+			return (String) properties.get("imeji.service.url");
+		return "http://localhost:8080";
+	}
+	
 
 	/**
 	 * Load the properties
