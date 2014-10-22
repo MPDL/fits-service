@@ -55,8 +55,8 @@ returns HTML view representation of the fits file referenced by the URL.
  
 ### Notes
  
-Because of Same-Origin Policy restrict, we use [http://www.w3.org/TR/cors/](Cross-Origin Resource Sharing) as the solution.
+Because of Same-Origin Policy restrict, we use [Cross-Origin Resource Sharing](http://www.w3.org/TR/cors/) as the solution.
 The response header must contains **Access-Control-Allow-Origin: * ** to make sure any other services which belongs to other domians can access out fit service. So the first layer service container(Tomcat or Apache) must response with such a header.
 
-- If you use **apache** as the fist service layer, you can enable it in apache configuation, check it [http://enable-cors.org/server_apache.html](here)
+- If you use **apache** as the fist service layer, you can enable it in apache configuation, check it [here](http://enable-cors.org/server_apache.html)
 - If you use **tomcat**, nothing more is needed to be done because fits handles the header.
